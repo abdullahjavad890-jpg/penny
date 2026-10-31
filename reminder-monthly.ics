@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Penny//Reminders//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:penny-monthly@penny
+DTSTAMP:20261101T000000Z
+DTSTART:20261101T100000
+DTEND:20261101T101000
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1
+SUMMARY:Penny: monthly recap and backup
+DESCRIPTION:Open Penny, check last month's recap, then More > Save a backup
+ .\nhttps://abdullahjavad890-jpg.github.io/penny/
+URL:https://abdullahjavad890-jpg.github.io/penny/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Penny: monthly recap and backup
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

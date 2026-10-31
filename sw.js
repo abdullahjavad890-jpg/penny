@@ -1,26 +1,41 @@
-// Bump this when you upload new versions of the files, so phones pick up the update.
-const CACHE = 'penny-v1';
-const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
+// Bump this whenever any file changes, so phones swap to the new version in one go.
+const CACHE = 'penny-v2';
+const SHELL = [
+  './', './index.html', './style.css', './core.js', './app.js', './manifest.webmanifest',
+  './font-fraunces.woff2', './font-instrument-sans.woff2',
+  './icon-180.png', './icon-192.png', './icon-512.png',
+];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's HTTP cache, so a new version never mixes with old files.
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k.startsWith('penny-') && k !== CACHE).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
-// Serve from cache right away, refresh the cache in the background.
+// App files come straight from the cache (instant, works offline). Updates arrive through a new CACHE version.
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(caches.open(CACHE).then(async cache => {
-    const hit = await cache.match(e.request, { ignoreSearch: true });
-    const net = fetch(e.request).then(res => {
-      if (res && (res.ok || res.type === 'opaque')) cache.put(e.request, res.clone());
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    if (req.mode === 'navigate') {
+      return (await cache.match('./')) || (await cache.match('./index.html')) || fetch(req);
+    }
+    const hit = await cache.match(req, { ignoreSearch: true });
+    if (hit) return hit;
+    try {
+      const res = await fetch(req);
+      if (res.ok && res.type === 'basic') cache.put(req, res.clone());
       return res;
-    }).catch(() => hit || Response.error());
-    return hit || net;
-  }));
+    } catch (err) {
+      return Response.error();
+    }
+  })());
 });

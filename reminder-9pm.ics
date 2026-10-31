@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Penny//Reminders//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:penny-daily-21@penny
+DTSTAMP:20261101T000000Z
+DTSTART:20261101T210000
+DTEND:20261101T211000
+RRULE:FREQ=DAILY
+SUMMARY:Log today in Penny
+DESCRIPTION:Open Penny and add anything you spent or earned today.\nhttps:/
+ /abdullahjavad890-jpg.github.io/penny/
+URL:https://abdullahjavad890-jpg.github.io/penny/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Log today in Penny
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
